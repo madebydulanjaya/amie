@@ -67,10 +67,10 @@
 <body>
 
   <h1>Privacy Policy</h1>
-  <p class="meta">Amie Chrome Extension &nbsp;·&nbsp; Last updated: March 2026</p>
+  <p class="meta">Amie Chrome Extension &nbsp;·&nbsp; Last updated: May 2026</p>
 
   <div class="highlight">
-    Amie processes everything locally on your device using Chrome's built-in Gemini Nano AI. No data is ever collected, transmitted, or stored on any external server.
+    Amie processes everything locally on your device using Chrome's built-in Gemini Nano AI. Network access is blocked at the manifest level — no data is ever collected, transmitted, or stored on any external server.
   </div>
 
   <h2>Who we are</h2>
@@ -82,8 +82,11 @@
     <li><strong>Page content</strong> — the text of the current web page, when you use the "Summarise this page" or related context menu actions.</li>
     <li><strong>Selected text</strong> — text you have highlighted on a page, when you invoke a context menu action on it.</li>
     <li><strong>Your chat messages</strong> — the messages you type into Amie's chat interface.</li>
-    <li><strong>Preferences</strong> — your chosen response style (Focused, Balanced, or Creative), colour theme, appearance, selected voice, and speak-responses setting.</li>
-    <li><strong>Conversation history</strong> — previous messages within the current session, used to maintain context.</li>
+    <li><strong>Preferences</strong> — your chosen response style (Focused, Balanced, or Creative), colour theme, appearance (light/dark/auto), selected voice, voice volume/speed/pitch, "always speak responses" setting, and follow-up suggestions setting.</li>
+    <li><strong>Conversation history</strong> — your chats, both the messages visible in the side panel and the full raw transcript kept in local storage so that search and recall work across chats.</li>
+    <li><strong>Memories you pin</strong> — replies you explicitly mark with the bookmark icon. Pinned memories apply across all chats so Amie can reference them in future conversations.</li>
+    <li><strong>Auto-generated summaries</strong> — when a chat becomes long enough that older turns can't fit in the model's context window, Amie creates a short summary of the older content locally and uses it in place of the raw turns. These summaries are stored on your device alongside your chats.</li>
+    <li><strong>Detected chat language</strong> — Amie uses Chrome's on-device Language Detector API on your first message in each chat to identify its language. The detected language is stored on the chat object so future replies can match it where supported.</li>
   </ul>
 
   <h2>How that data is used</h2>
@@ -96,21 +99,34 @@
     <li>Shared with data brokers or resellers</li>
   </ul>
 
+  <h2>Network access</h2>
+  <p>Amie's manifest sets a Content Security Policy of <code>connect-src 'none'</code>, which means the browser itself blocks the extension from making any network requests — to Amie's developer, to Google, or to any other server. This is a guarantee enforced by Chrome, not by the extension's own code.</p>
+  <p>The only network activity associated with Amie is the one-time download of the Gemini Nano model files, performed by Chrome itself when you first use a Chrome built-in AI feature. After the model is on your device, no further network traffic is required.</p>
+
   <h2>Local storage</h2>
-  <p>Amie uses Chrome's local storage API to save your preferences and conversation history on your own device. This data never leaves your computer and is cleared automatically when you uninstall the extension.</p>
+  <p>Amie keeps all of its data on your own device using two browser-provided storage mechanisms:</p>
+  <ul>
+    <li><strong>chrome.storage.local</strong> — your preferences, the list of chats you've started, the visible message history of each chat, and your pinned-chat selection.</li>
+    <li><strong>IndexedDB</strong> (database name <code>amie_memory</code>) — the full raw message archive used for search, the auto-generated summaries described above, and your pinned memories.</li>
+  </ul>
+  <p>Both stores live entirely on your device. None of this data ever leaves your computer, and all of it is removed when you uninstall the extension. You can also manage and delete this data at any time from <strong>Settings → Memories</strong> and <strong>Settings → Storage</strong> inside the extension.</p>
+
+  <h2>Voice (text-to-speech)</h2>
+  <p>When you ask Amie to read a reply aloud, or enable "Always speak responses", Amie uses your operating system's built-in voices via the browser's Web Speech API. Amie filters this list to <strong>on-device voices only</strong> — voices that synthesise audio locally on your machine. Network-backed voices that some operating systems also expose are intentionally excluded so that the text being read never leaves your device.</p>
 
   <h2>Gemini Nano (Chrome's built-in AI)</h2>
-  <p>AI processing is performed by Gemini Nano, a model built into Chrome by Google. This model runs locally and does not require an internet connection to function. For information about how Google handles Gemini Nano, refer to <a href="https://policies.google.com/privacy" target="_blank">Google's Privacy Policy</a>.</p>
+  <p>AI processing is performed by Gemini Nano, a model built into Chrome by Google. This model runs locally and does not require an internet connection to function. Amie also uses Chrome's built-in Summarizer API (for page and selection summaries, and for automatic conversation compression) and Language Detector API (for identifying the language you're chatting in) — both of which are also on-device. For information about how Google handles these built-in AI features, refer to <a href="https://policies.google.com/privacy" target="_blank">Google's Privacy Policy</a>.</p>
 
   <h2>Permissions</h2>
   <p>Amie requests the following Chrome permissions, each used only for the purpose described:</p>
   <ul>
     <li><strong>sidePanel</strong> — to display the chat interface in Chrome's side panel.</li>
-    <li><strong>storage</strong> — to save your preferences and conversation history locally on your device.</li>
-    <li><strong>activeTab</strong> — to access the current tab's content when you explicitly request a summary or use a context menu action.</li>
-    <li><strong>scripting</strong> — to extract the text content of a page when you request a summary or use a context menu action.</li>
-    <li><strong>contextMenus</strong> — to provide right-click actions such as "Summarise", "Explain", and "Fix grammar".</li>
+    <li><strong>storage</strong> — to save your preferences, chats, memories, and summaries locally on your device.</li>
+    <li><strong>activeTab</strong> — to access the current tab's content when you explicitly request a summary or use a context menu action. Amie never reads tabs you haven't acted on.</li>
+    <li><strong>scripting</strong> — to extract the readable text of a page when you request a summary or use a context menu action.</li>
+    <li><strong>contextMenus</strong> — to provide right-click actions such as "Summarise this page", "Summarise selection", "Explain in simple terms", and "Fix grammar and clarity".</li>
   </ul>
+  <p>Amie does not request <code>host_permissions</code> or any "all sites" access. The extension can only read a page's contents at the moment you act on it from the side panel or right-click menu.</p>
 
   <h2>Children's privacy</h2>
   <p>Amie is not directed at children under the age of 13 and does not knowingly collect any information from them.</p>
@@ -122,7 +138,7 @@
   <p>If you have questions about this policy, please open an issue on the extension's support page or contact the developer directly via the Chrome Web Store listing.</p>
 
   <div class="highlight">
-    <strong>Summary:</strong> Amie reads page content only when you ask it to, processes it entirely on your device, and never sends anything anywhere. Your data stays yours.
+    <strong>Summary:</strong> Amie reads page content only when you ask it to, processes everything entirely on your device with Chrome's built-in AI, and is prevented from making any network requests by its own manifest. Your chats, memories, preferences, and voice all stay on your machine. Your data stays yours.
   </div>
 
   <hr>
